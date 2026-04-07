@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Generator — Cambridge Institute of Technology North Campus</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --navy: #0b1f3a;
+      --gold: #d4a017;
+      --gold-light: #f0c842;
+      --cream: #fdf8ef;
+      --dark: #070f1e;
+      --muted: #8899b0;
+      --card-bg: #0e2040;
+      --border: rgba(212,160,23,0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--dark);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── ANIMATED BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 10% 0%, rgba(212,160,23,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 100%, rgba(11,31,58,0.6) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative; z-index: 10;
+      background: linear-gradient(135deg, var(--navy) 0%, #0a1828 100%);
+      border-bottom: 2px solid var(--gold);
+      padding: 0;
+      box-shadow: 0 4px 40px rgba(212,160,23,0.15);
+    }
+
+    .header-top {
+      display: flex; align-items: center; gap: 20px;
+      padding: 18px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo-ring {
+  width: 64px; height: 64px; flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  background: var(--dark);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 20px rgba(212,160,23,0.3), inset 0 0 10px rgba(212,160,23,0.05);
+  overflow: hidden;
+}
+
+    .college-info h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem; font-weight: 900;
+      color: var(--cream);
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+    }
+
+    .college-info .sub {
+      font-size: 0.78rem; font-weight: 300;
+      color: var(--gold);
+      letter-spacing: 0.12em; text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .header-nav {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 10px 48px;
+      background: rgba(212,160,23,0.04);
+    }
+
+    .badge {
+      padding: 5px 14px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.72rem; font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .badge:hover { border-color: var(--gold); color: var(--gold); }
+    .badge.active { border-color: var(--gold); color: var(--gold); background: rgba(212,160,23,0.08); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 5;
+      text-align: center;
+      padding: 52px 24px 30px;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(212,160,23,0.08);
+      border: 1px solid var(--border);
+      padding: 6px 18px; border-radius: 20px;
+      margin-bottom: 18px;
+    }
+
+    .hero h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      color: var(--cream);
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    .hero h2 span { color: var(--gold); }
+
+    .hero p {
+      font-size: 0.95rem; color: var(--muted);
+      max-width: 500px; margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .main-grid {
+      position: relative; z-index: 5;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 28px;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 28px 60px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 22px;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .card-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px; height: 18px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    /* ── FORM ELEMENTS ── */
+    label {
+      display: block;
+      font-size: 0.78rem; font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    textarea, select {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.93rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: vertical;
+    }
+
+    textarea:focus, select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(212,160,23,0.12);
+    }
+
+    textarea { min-height: 90px; }
+    select option { background: #0b1f3a; }
+
+    .form-row { margin-bottom: 20px; }
+
+    .color-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .color-pick {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .color-pick:hover { border-color: var(--gold); }
+
+    .color-pick input[type="color"] {
+      width: 32px; height: 32px;
+      border: none; border-radius: 6px;
+      padding: 0; cursor: pointer;
+      background: transparent;
+    }
+
+    .color-pick span {
+      font-size: 0.82rem; color: var(--muted);
+    }
+
+    .style-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .style-opt {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .style-opt:hover { border-color: var(--gold); }
+    .style-opt.selected {
+      border-color: var(--gold);
+      background: rgba(212,160,23,0.08);
+    }
+
+    .style-opt input { display: none; }
+
+    .style-icon {
+      width: 28px; height: 28px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 3px;
+    }
+
+    .style-icon .sq {
+      background: var(--gold);
+      border-radius: 1px;
+    }
+
+    .style-icon.rd .sq { border-radius: 50%; }
+
+    .style-opt span {
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--muted);
+    }
+    .style-opt.selected span { color: var(--gold); }
+
+    /* ── BUTTON ── */
+    .btn-generate {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+      color: var(--dark);
+      border: none; border-radius: 10px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 4px 20px rgba(212,160,23,0.3);
+    }
+
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(212,160,23,0.45);
+    }
+
+    .btn-generate:active { transform: translateY(0); }
+
+    /* ── QR PREVIEW PANEL ── */
+    .preview-card {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 20px;
+    }
+
+    .qr-frame {
+      width: 100%; aspect-ratio: 1;
+      max-width: 320px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-frame img {
+      width: 85%; height: 85%;
+      object-fit: contain;
+      border-radius: 8px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .qr-placeholder {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      opacity: 0.3;
+    }
+
+    .qr-placeholder svg { width: 80px; height: 80px; }
+
+    .qr-placeholder p {
+      font-size: 0.82rem; color: var(--muted);
+      text-align: center; line-height: 1.5;
+    }
+
+    .corner {
+      position: absolute;
+      width: 18px; height: 18px;
+      border-color: var(--gold);
+      border-style: solid;
+      opacity: 0.5;
+    }
+    .corner.tl { top: 10px; left: 10px; border-width: 2px 0 0 2px; }
+    .corner.tr { top: 10px; right: 10px; border-width: 2px 2px 0 0; }
+    .corner.bl { bottom: 10px; left: 10px; border-width: 0 0 2px 2px; }
+    .corner.br { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
+
+    .btn-download {
+      width: 100%;
+      padding: 13px;
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    .btn-download:hover {
+      background: rgba(212,160,23,0.08);
+      box-shadow: 0 4px 20px rgba(212,160,23,0.15);
+    }
+
+    .btn-download:disabled {
+      opacity: 0.3; cursor: not-allowed;
+    }
+
+    .info-strip {
+      width: 100%;
+      background: rgba(212,160,23,0.06);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.78rem; color: var(--muted);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .info-strip strong { color: var(--gold); }
+
+    /* ── SPINNER ── */
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(212,160,23,0.2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 5;
+      text-align: center;
+      padding: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    footer strong { color: var(--gold); }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: var(--card-bg);
+      border: 1px solid var(--gold);
+      border-radius: 10px;
+      padding: 12px 20px;
+      color: var(--cream);
+      font-size: 0.85rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    @media (max-width: 720px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .header-top { padding: 16px 20px; }
+      .header-nav { padding: 8px 20px; flex-wrap: wrap; }
+      .hero { padding: 36px 20px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-top">
+  <div class="logo-ring">
+    <img src="{{ url_for('static', filename='college_logo.jpg') }}" 
+         alt="CIT Logo" 
+         style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover;"/>
+  </div>
+  <div class="college-info">
+    <h1>Cambridge Institute of Technology North Campus</h1>
+    <div class="sub">Bangalore</div>
+  </div>
+</div>
+
+    <div class="header-nav">
+      <div class="badge active">QR Code Generator</div>
+      <div class="badge">Computer Science Dept.</div>
+      <div class="badge">Academic Tools</div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">✦ Digital Tools Initiative</div>
+    <h2>Generate Your <span>QR Code</span></h2>
+    <p>Instantly encode URLs, text, contacts, or any data into a scannable QR code — powered by CIT North Campus.</p>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-grid">
+
+    <!-- LEFT: FORM -->
+    <div class="card">
+      <div class="card-title">Configure QR Code</div>
+
+      <div class="form-row">
+        <label>Text / URL / Data</label>
+        <textarea id="qr-input" placeholder="Enter URL, text, phone number, email…"></textarea>
+      </div>
+
+      <div class="color-row">
+        <div>
+          <label>Foreground Color</label>
+          <div class="color-pick">
+            <input type="color" id="fg-color" value="#0b1f3a"/>
+            <span>Module Color</span>
+          </div>
+        </div>
+        <div>
+          <label>Background Color</label>
+          <div class="color-pick">
+            <input type="color" id="bg-color" value="#fdf8ef"/>
+            <span>Background</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Module Style</label>
+        <div class="style-grid">
+          <label class="style-opt selected" id="style-square">
+            <input type="radio" name="style" value="square" checked/>
+            <div class="style-icon">
+              <div class="sq"></div><div class="sq"></div>
+              <div class="sq"></div><div class="sq"></div>
+            </div>
+            <span>Square</span>
+          </label>
+          <label class="style-opt" id="style-rounded">
+            <input type="radio" name="style" value="rounded"/>
+            <div class="style-icon rd">
+              <div class="sq"></div><div class="sq"></div>
+              <div class="sq"></div><div class="sq"></div>
+            </div>
+            <span>Rounded</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Error Correction Level</label>
+        <select id="error-level">
+          <option value="L">Low (L) — 7% correction</option>
+          <option value="M" selected>Medium (M) — 15% correction</option>
+          <option value="Q">Quartile (Q) — 25% correction</option>
+          <option value="H">High (H) — 30% correction</option>
+        </select>
+      </div>
+
+      <button class="btn-generate" onclick="generateQR()">
+        ✦ Generate QR Code
+      </button>
+    </div>
+
+    <!-- RIGHT: PREVIEW -->
+    <div class="card preview-card">
+      <div class="card-title">Preview</div>
+
+      <div class="qr-frame" id="qr-frame">
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+        <div class="qr-placeholder" id="placeholder">
+          <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="28" height="28" rx="3" stroke="#d4a017" stroke-width="2"/>
+            <rect x="12" y="12" width="12" height="12" fill="#d4a017" rx="1"/>
+            <rect x="48" y="4" width="28" height="28" rx="3" stroke="#d4a017" stroke-width="2"/>
+            <rect x="56" y="12" width="12" height="12" fill="#d4a017" rx="1"/>
+            <rect x="4" y="48" width="28" height="28" rx="3" stroke="#d4a017" stroke-width="2"/>
+            <rect x="12" y="56" width="12" height="12" fill="#d4a017" rx="1"/>
+            <rect x="48" y="48" width="8" height="8" fill="#d4a017" rx="1"/>
+            <rect x="60" y="48" width="8" height="8" fill="#d4a017" rx="1"/>
+            <rect x="48" y="60" width="8" height="8" fill="#d4a017" rx="1"/>
+            <rect x="60" y="60" width="8" height="8" fill="#d4a017" rx="1"/>
+          </svg>
+          <p>Your QR code<br/>will appear here</p>
+        </div>
+      </div>
+
+      <button class="btn-download" id="download-btn" disabled onclick="downloadQR()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download PNG
+      </button>
+
+      <div class="info-strip">
+        <strong>CIT North Campus</strong> — Scan with any QR reader.<br/>
+        High-res PNG ready for print & digital use.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <strong>Cambridge Institute of Technology — North Campus</strong> &nbsp;·&nbsp; Bangalore<br/>
+    QR Code Generator &nbsp;·&nbsp; Academic Digital Tools Suite
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let currentData = null;
+
+    // Style toggle
+    document.querySelectorAll('.style-opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.style-opt').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+      });
+    });
+
+    function showToast(msg, duration = 2800) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), duration);
+    }
+
+    async function generateQR() {
+      const text = document.getElementById('qr-input').value.trim();
+      if (!text) { showToast('⚠ Please enter some text or URL first.'); return; }
+
+      const fg = document.getElementById('fg-color').value;
+      const bg = document.getElementById('bg-color').value;
+      const style = document.querySelector('input[name="style"]:checked').value;
+      const err = document.getElementById('error-level').value;
+
+      currentData = { text, fg_color: fg, bg_color: bg, style, error_level: err };
+
+      // Show spinner
+      const frame = document.getElementById('qr-frame');
+      document.getElementById('placeholder').style.display = 'none';
+      const existing = frame.querySelector('img');
+      if (existing) existing.remove();
+      const spinner = document.createElement('div');
+      spinner.className = 'spinner';
+      frame.appendChild(spinner);
+
+      try {
+        const res = await fetch('/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(currentData)
+        });
+        const data = await res.json();
+
+        spinner.remove();
+        if (data.error) { showToast('✕ ' + data.error); document.getElementById('placeholder').style.display = 'flex'; return; }
+
+        const img = document.createElement('img');
+        img.src = data.image;
+        frame.appendChild(img);
+        document.getElementById('download-btn').disabled = false;
+        showToast('✓ QR Code generated successfully!');
+      } catch {
+        spinner.remove();
+        document.getElementById('placeholder').style.display = 'flex';
+        showToast('✕ Error generating QR code.');
+      }
+    }
+
+    async function downloadQR() {
+      if (!currentData) return;
+      const res = await fetch('/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentData)
+      });
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'qrcode_CITNC.png';
+      a.click(); URL.revokeObjectURL(url);
+      showToast('✓ Downloading QR code…');
+    }
+
+    // Allow Enter key to generate
+    document.getElementById('qr-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && e.ctrlKey) generateQR();
+    });
+  </script>
+</body>
+</html>
